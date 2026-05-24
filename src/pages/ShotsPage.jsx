@@ -1,30 +1,40 @@
 import { useState } from 'react'
 import { useShotSessions } from '../hooks/useShotSessions'
-import { SHOT_TYPES, THEME } from '../lib/constants'
+import { useDeviceRole } from '../context/DeviceRoleContext'
+import { SPORTS, getSportsForKid } from '../lib/sports'
+import { THEME } from '../lib/constants'
+import SportSelector from '../components/SportSelector'
+import BasketballForm from '../components/sports/BasketballForm'
+import BaseballForm from '../components/sports/BaseballForm'
+import SoccerForm from '../components/sports/SoccerForm'
 
-export default function ShotsPage({ kidId, kidName }) {
-  const { sessions, addSession, loading, error } = useShotSessions(kidId)
-  const [form, setForm] = useState({ shot_type: 'Free Throws', makes: '', attempts: '' })
-  const [submitting, setSubmitting] = useState(false)
+const FORMS = {
+  basketball: BasketballForm,
+  baseball:   BaseballForm,
+  soccer:     SoccerForm,
+}
+
+export default function ShotsPage({ kidId }) {
+  const sportsAvailable = getSportsForKid(kidId)
+  const [sport, setSport] = useState(sportsAvailable[0])
+
+  const { sessions, addSession, loading, error } = useShotSessions(kidId, sport)
+  const { canEdit } = useDeviceRole()
+  const editable = canEdit(kidId)
+
+  const sportCfg = SPORTS[sport]
+  const Form = FORMS[sport]
 
   const totalMakes    = sessions.reduce((s, x) => s + x.makes, 0)
   const totalAttempts = sessions.reduce((s, x) => s + x.attempts, 0)
   const overallPct    = totalAttempts ? Math.round((totalMakes / totalAttempts) * 100) : null
 
-  const byType = SHOT_TYPES.map(type => {
+  const byType = sportCfg.shotTypes.map(type => {
     const s = sessions.filter(x => x.shot_type === type)
     const m = s.reduce((a, x) => a + x.makes, 0)
     const a = s.reduce((a, x) => a + x.attempts, 0)
     return { type, makes: m, attempts: a, pct: a ? Math.round((m / a) * 100) : null }
   }).filter(x => x.attempts > 0)
-
-  const handleSubmit = async () => {
-    if (!form.makes || !form.attempts) return
-    setSubmitting(true)
-    await addSession(form)
-    setForm(f => ({ ...f, makes: '', attempts: '' }))
-    setSubmitting(false)
-  }
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: THEME.muted }}>Loading...</div>
   if (error)   return <ErrorState message={error} />
@@ -32,7 +42,23 @@ export default function ShotsPage({ kidId, kidName }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* Today's summary */}
+      {!editable && (
+        <div style={{
+          padding: '8px 12px',
+          borderRadius: 8,
+          background: `${THEME.gold}11`,
+          border: `1px solid ${THEME.gold}44`,
+          color: THEME.gold,
+          fontSize: 12,
+          textAlign: 'center',
+        }}>
+          👀 Viewing only — switch back to your own tab to log shots.
+        </div>
+      )}
+
+      <SportSelector sports={sportsAvailable} value={sport} onChange={setSport} />
+
+      {/* Today's summary — only shown when there's data to summarize */}
       {totalAttempts > 0 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <StatPill label="Makes"    value={totalMakes} />
@@ -44,7 +70,7 @@ export default function ShotsPage({ kidId, kidName }) {
 
       {/* By type breakdown */}
       {byType.length > 0 && (
-        <Section label="Today by Type">
+        <Section label={`Today by Type`}>
           {byType.map(t => (
             <div key={t.type} style={{
               display: 'flex',
@@ -65,61 +91,12 @@ export default function ShotsPage({ kidId, kidName }) {
         </Section>
       )}
 
-      {/* Log form */}
-      <Section label="Log Shots">
-        {/* Shot type selector */}
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
-          {SHOT_TYPES.map(type => (
-            <button
-              key={type}
-              onClick={() => setForm(f => ({ ...f, shot_type: type }))}
-              style={{
-                padding: '6px 12px',
-                borderRadius: 6,
-                border: `1px solid ${form.shot_type === type ? THEME.gold : THEME.border}`,
-                background: form.shot_type === type ? `${THEME.gold}22` : 'transparent',
-                color: form.shot_type === type ? THEME.gold : THEME.muted,
-                fontSize: 13,
-                fontFamily: 'DM Sans, sans-serif',
-                transition: 'all 0.15s',
-              }}
-            >{type}</button>
-          ))}
-        </div>
-
-        {/* Makes / Attempts inputs */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="Makes"
-            value={form.makes}
-            onChange={e => setForm(f => ({ ...f, makes: e.target.value }))}
-            style={{ flex: 1, padding: '10px 12px' }}
-          />
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="Attempts"
-            value={form.attempts}
-            onChange={e => setForm(f => ({ ...f, attempts: e.target.value }))}
-            style={{ flex: 1, padding: '10px 12px' }}
-          />
-          <button
-            onClick={handleSubmit}
-            disabled={submitting || !form.makes || !form.attempts}
-            style={{
-              padding: '10px 18px',
-              background: THEME.purple,
-              border: 'none',
-              borderRadius: 8,
-              color: THEME.text,
-              fontWeight: 700,
-              fontSize: 18,
-            }}
-          >+</button>
-        </div>
-      </Section>
+      {/* Log form (sport-specific) */}
+      {editable && (
+        <Section label={`Log ${sportCfg.label}`}>
+          <Form onAdd={addSession} disabled={!editable} />
+        </Section>
+      )}
 
       {/* Session history */}
       {sessions.length > 0 && (

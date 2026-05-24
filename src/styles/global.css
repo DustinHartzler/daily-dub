@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
+
 /* ─── CSS Variables (Dayton Christian theme) ───────────────────────────────── */
 :root {
   --purple:   #4B2D83;
@@ -45,8 +47,6 @@ body {
 }
 
 /* ─── Typography ───────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
-
 .font-display {
   font-family: 'Barlow Condensed', sans-serif;
 }

@@ -5,23 +5,24 @@ export const KIDS = [
 ]
 
 // ─── Daily Chores ─────────────────────────────────────────────────────────────
-// Shared across both kids — extend per-kid in a future iteration if needed
-export const CHORES = [
+const SHARED_CHORES = [
   'Make bed',
   'Pick up clothes',
-  'Clean room',
-  'Take out trash',
-  'Feed pets',
   'Brush teeth (AM)',
-  'Brush teeth (PM)',
-  'Put dishes away',
 ]
+
+export const CHORES_BY_KID = {
+  kenley: SHARED_CHORES,
+  kellen: SHARED_CHORES,
+}
+
+export const getChores = (kidId) => CHORES_BY_KID[kidId] ?? []
 
 // ─── Timed Tasks ──────────────────────────────────────────────────────────────
 export const TIMED_TASKS = [
   { id: 'reading', label: 'Reading',  icon: '📖', targetMinutes: 15 },
   { id: 'piano',   label: 'Piano',    icon: '🎹', targetMinutes: 15 },
-  { id: 'spanish', label: 'Spanish',  icon: '🇪🇸', targetMinutes: 15 },
+  { id: 'spanish', label: 'Spanish',  icon: '🇪🇸', targetMinutes: 15, hasNote: true, notePlaceholder: 'What did you do? (Duolingo, show, book…)' },
 ]
 
 // ─── Basketball Shot Types ────────────────────────────────────────────────────
@@ -60,4 +61,5 @@ export const blankDailyLog = (kidId) => ({
   reading_seconds: 0,
   piano_seconds:   0,
   spanish_seconds: 0,
+  spanish_note:    '',
 })

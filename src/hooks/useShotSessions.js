@@ -3,16 +3,22 @@ import { supabase } from '../lib/supabase'
 import { todayString } from '../lib/constants'
 
 /**
- * useShotSessions — loads and creates shot session rows for a kid.
+ * useShotSessions — loads and creates session rows for a kid + sport.
+ *
+ * Args:
+ *   kidId  — required
+ *   sport  — defaults to 'basketball'. When provided, queries/inserts are scoped to that sport.
+ *
+ * TODO: rename the underlying table to practice_sessions when baseball/soccer have real forms.
  *
  * Returns:
- *   sessions      — array of today's shot sessions
- *   allSessions   — array of all-time sessions (for stats)
- *   addSession    — ({ shot_type, makes, attempts }) => void
+ *   sessions      — today's sessions for this sport
+ *   allSessions   — all-time sessions for this sport (for stats)
+ *   addSession    — ({ shot_type, makes, attempts, metrics? }) => void
  *   loading       — boolean
  *   error         — string | null
  */
-export function useShotSessions(kidId) {
+export function useShotSessions(kidId, sport = 'basketball') {
   const [sessions, setSessions]       = useState([])
   const [allSessions, setAllSessions] = useState([])
   const [loading, setLoading]         = useState(true)
@@ -22,19 +28,19 @@ export function useShotSessions(kidId) {
     if (!kidId) return
     setLoading(true)
 
-    // Today's sessions
     const { data: todayData, error: e1 } = await supabase
       .from('shot_sessions')
       .select('*')
       .eq('kid_id', kidId)
+      .eq('sport', sport)
       .eq('date', todayString())
       .order('created_at', { ascending: false })
 
-    // All-time sessions (for weekly/monthly stats)
     const { data: allData, error: e2 } = await supabase
       .from('shot_sessions')
       .select('*')
       .eq('kid_id', kidId)
+      .eq('sport', sport)
       .order('date', { ascending: false })
 
     if (e1 || e2) setError((e1 || e2).message)
@@ -44,20 +50,21 @@ export function useShotSessions(kidId) {
     }
 
     setLoading(false)
-  }, [kidId])
+  }, [kidId, sport])
 
   useEffect(() => { loadSessions() }, [loadSessions])
 
-  const addSession = useCallback(async ({ shot_type, makes, attempts }) => {
+  const addSession = useCallback(async ({ shot_type, makes, attempts, metrics }) => {
     const newSession = {
       kid_id:    kidId,
       date:      todayString(),
+      sport,
       shot_type,
       makes:     parseInt(makes),
       attempts:  parseInt(attempts),
+      metrics:   metrics ?? {},
     }
 
-    // Optimistic
     setSessions(s => [newSession, ...s])
     setAllSessions(s => [newSession, ...s])
 
@@ -67,9 +74,9 @@ export function useShotSessions(kidId) {
 
     if (error) {
       setError(error.message)
-      loadSessions() // reload on failure
+      loadSessions()
     }
-  }, [kidId, loadSessions])
+  }, [kidId, sport, loadSessions])
 
   return { sessions, allSessions, addSession, loading, error }
 }

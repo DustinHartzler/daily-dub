@@ -1,5 +1,6 @@
 import { useShotSessions } from '../hooks/useShotSessions'
 import { THEME } from '../lib/constants'
+import BadgeRow from '../components/BadgeRow'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getWeekStart() {
@@ -32,6 +33,8 @@ export default function StatsPage({ kidId, kidName }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      <BadgeRow kidId={kidId} />
 
       {/* Shooting — this week */}
       <ShootingBlock label="This Week" sessions={weekSessions} />

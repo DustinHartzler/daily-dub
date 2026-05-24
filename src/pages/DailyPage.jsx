@@ -1,43 +1,60 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDailyLog } from '../hooks/useDailyLog'
-import { CHORES, TIMED_TASKS, THEME } from '../lib/constants'
+import { useDeviceRole } from '../context/DeviceRoleContext'
+import { getChores, TIMED_TASKS, THEME } from '../lib/constants'
+import WeeklyChallengesCard from '../components/WeeklyChallengesCard'
 
 export default function DailyPage({ kidId }) {
   const { log, updateLog, loading, error } = useDailyLog(kidId)
+  const { canEdit } = useDeviceRole()
+  const editable = canEdit(kidId)
+  const chores = getChores(kidId)
 
   if (loading) return <LoadingState />
   if (error)   return <ErrorState message={error} />
 
-  const choresCompleted = CHORES.filter(c => log.chores?.[c]).length
+  const choresCompleted = chores.filter(c => log.chores?.[c]).length
   const timedDone = TIMED_TASKS.filter(t => {
     const secs = log[`${t.id}_seconds`] ?? 0
     return secs >= t.targetMinutes * 60
   }).length
 
-  const total = CHORES.length + TIMED_TASKS.length
+  const total = chores.length + TIMED_TASKS.length
   const done  = choresCompleted + timedDone
 
   const toggleChore = (chore) => {
+    if (!editable) return
     updateLog({ chores: { ...log.chores, [chore]: !log.chores?.[chore] } })
   }
 
   const updateSeconds = (taskId, seconds) => {
+    if (!editable) return
     updateLog({ [`${taskId}_seconds`]: seconds })
+  }
+
+  const updateNote = (taskId, note) => {
+    if (!editable) return
+    updateLog({ [`${taskId}_note`]: note })
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
+      {!editable && <ReadOnlyBanner />}
+
+      <WeeklyChallengesCard />
+
       {/* Progress summary */}
       <ProgressBar done={done} total={total} />
 
       {/* Chores */}
-      <Section label="Chores" count={`${choresCompleted}/${CHORES.length}`}>
-        {CHORES.map(chore => (
+      <Section label="Chores" count={`${choresCompleted}/${chores.length}`}>
+        {chores.map(chore => (
           <CheckRow
             key={chore}
             label={chore}
             checked={!!log.chores?.[chore]}
+            editable={editable}
             onToggle={() => toggleChore(chore)}
           />
         ))}
@@ -50,11 +67,30 @@ export default function DailyPage({ kidId }) {
             key={task.id}
             task={task}
             currentSeconds={log[`${task.id}_seconds`] ?? 0}
+            note={task.hasNote ? (log[`${task.id}_note`] ?? '') : undefined}
+            editable={editable}
             onUpdate={(secs) => updateSeconds(task.id, secs)}
+            onNoteChange={task.hasNote ? (note) => updateNote(task.id, note) : undefined}
           />
         ))}
       </Section>
 
+    </div>
+  )
+}
+
+function ReadOnlyBanner() {
+  return (
+    <div style={{
+      padding: '8px 12px',
+      borderRadius: 8,
+      background: `${THEME.gold}11`,
+      border: `1px solid ${THEME.gold}44`,
+      color: THEME.gold,
+      fontSize: 12,
+      textAlign: 'center',
+    }}>
+      👀 Viewing only — switch back to your own tab to make changes.
     </div>
   )
 }
@@ -111,14 +147,15 @@ function Section({ label, count, children }) {
 }
 
 // ─── Check Row ────────────────────────────────────────────────────────────────
-function CheckRow({ label, checked, onToggle }) {
+function CheckRow({ label, checked, onToggle, editable = true }) {
   return (
     <div
       role="checkbox"
       aria-checked={checked}
-      tabIndex={0}
-      onClick={onToggle}
-      onKeyDown={e => e.key === 'Enter' || e.key === ' ' ? onToggle() : null}
+      aria-disabled={!editable}
+      tabIndex={editable ? 0 : -1}
+      onClick={editable ? onToggle : undefined}
+      onKeyDown={editable ? (e => e.key === 'Enter' || e.key === ' ' ? onToggle() : null) : undefined}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -127,7 +164,8 @@ function CheckRow({ label, checked, onToggle }) {
         background: checked ? `${THEME.purple}33` : THEME.surface2,
         border: `1px solid ${checked ? THEME.purple : THEME.border}`,
         borderRadius: 10,
-        cursor: 'pointer',
+        cursor: editable ? 'pointer' : 'default',
+        opacity: editable ? 1 : 0.65,
         userSelect: 'none',
         transition: 'all 0.15s',
       }}
@@ -157,13 +195,17 @@ function CheckRow({ label, checked, onToggle }) {
 }
 
 // ─── Timed Task ───────────────────────────────────────────────────────────────
-function TimedTask({ task, currentSeconds, onUpdate }) {
+function TimedTask({ task, currentSeconds, note, onUpdate, onNoteChange, editable = true }) {
   const [running, setRunning] = useState(false)
+  const [draftNote, setDraftNote] = useState(note ?? '')
   const intervalRef = useRef(null)
   const localRef = useRef(currentSeconds)
 
   // Keep localRef in sync when prop changes (e.g. kid switch)
   useEffect(() => { localRef.current = currentSeconds }, [currentSeconds])
+
+  // Reset draft when the saved note changes (kid switch, day change)
+  useEffect(() => { setDraftNote(note ?? '') }, [note])
 
   const targetSeconds = task.targetMinutes * 60
   const isDone = currentSeconds >= targetSeconds
@@ -228,7 +270,7 @@ function TimedTask({ task, currentSeconds, onUpdate }) {
       <div style={{ display: 'flex', gap: 8 }}>
         <button
           onClick={toggle}
-          disabled={isDone}
+          disabled={isDone || !editable}
           style={{
             flex: 1,
             padding: '8px 0',
@@ -238,12 +280,14 @@ function TimedTask({ task, currentSeconds, onUpdate }) {
             color: running ? THEME.gold : THEME.text,
             fontWeight: 700,
             fontSize: 14,
+            opacity: editable ? 1 : 0.55,
           }}
         >
           {isDone ? 'Complete ✓' : running ? '⏸ Pause' : '▶ Start'}
         </button>
         <button
           onClick={reset}
+          disabled={!editable}
           style={{
             padding: '8px 14px',
             background: 'transparent',
@@ -251,9 +295,28 @@ function TimedTask({ task, currentSeconds, onUpdate }) {
             borderRadius: 8,
             color: THEME.muted,
             fontSize: 14,
+            opacity: editable ? 1 : 0.55,
           }}
         >↺</button>
       </div>
+
+      {/* Optional note field */}
+      {onNoteChange && (
+        <input
+          type="text"
+          value={draftNote}
+          onChange={e => setDraftNote(e.target.value)}
+          onBlur={() => { if (editable && draftNote !== (note ?? '')) onNoteChange(draftNote) }}
+          placeholder={task.notePlaceholder ?? 'Add a note…'}
+          disabled={!editable}
+          style={{
+            marginTop: 10,
+            padding: '8px 12px',
+            fontSize: 14,
+            opacity: editable ? 1 : 0.65,
+          }}
+        />
+      )}
     </div>
   )
 }

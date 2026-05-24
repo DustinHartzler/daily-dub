@@ -1,5 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { KIDS, THEME } from './lib/constants'
+import { DeviceRoleProvider, useDeviceRole } from './context/DeviceRoleContext'
+import SetupPage from './pages/SetupPage'
+import ParentDashboard from './pages/ParentDashboard'
+import PinPad from './components/PinPad'
+import RewardToast from './components/RewardToast'
 import DailyPage from './pages/DailyPage'
 import ShotsPage from './pages/ShotsPage'
 import StatsPage from './pages/StatsPage'
@@ -11,10 +16,32 @@ const TABS = [
 ]
 
 export default function App() {
-  const [activeKid, setActiveKid] = useState(KIDS[0].id)
-  const [activeTab, setActiveTab] = useState('daily')
+  return (
+    <DeviceRoleProvider>
+      <AppShell />
+    </DeviceRoleProvider>
+  )
+}
 
-  const kid = KIDS.find(k => k.id === activeKid)
+function AppShell() {
+  const { role } = useDeviceRole()
+  if (role == null)      return <SetupPage />
+  if (role === 'parent') return <ParentDashboard />
+  return <KidShell />
+}
+
+function KidShell() {
+  const { viewingKidId, setViewingKidId, parentPinHash, clearRole } = useDeviceRole()
+  const [activeTab, setActiveTab] = useState('daily')
+  const [showResetPad, setShowResetPad] = useState(false)
+
+  const kid = KIDS.find(k => k.id === viewingKidId) ?? KIDS[0]
+
+  const handleReset = () => {
+    // No PIN ever set → just clear (shouldn't happen normally, but safe fallback)
+    if (!parentPinHash) { clearRole(); return }
+    setShowResetPad(true)
+  }
 
   return (
     <div style={{
@@ -25,29 +52,42 @@ export default function App() {
     }}>
       <div style={{ width: '100%', maxWidth: 768, display: 'flex', flexDirection: 'column', position: 'relative' }}>
 
-        {/* ── Header ── */}
-        <Header kid={kid} activeKid={activeKid} setActiveKid={setActiveKid} />
+        <Header
+          kid={kid}
+          activeKid={viewingKidId}
+          setActiveKid={setViewingKidId}
+          onLongPress={handleReset}
+        />
 
-        {/* ── Tab Nav ── */}
         <TabNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* ── Page Content ── */}
         <main style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 120px' }}>
-          {activeTab === 'daily' && <DailyPage kidId={activeKid} />}
-          {activeTab === 'shots' && <ShotsPage kidId={activeKid} kidName={kid.name} />}
-          {activeTab === 'stats' && <StatsPage kidId={activeKid} kidName={kid.name} />}
+          {activeTab === 'daily' && <DailyPage kidId={viewingKidId} />}
+          {activeTab === 'shots' && <ShotsPage kidId={viewingKidId} kidName={kid.name} />}
+          {activeTab === 'stats' && <StatsPage kidId={viewingKidId} kidName={kid.name} />}
         </main>
 
+        {showResetPad && (
+          <ResetOverlay
+            expectedHash={parentPinHash}
+            onCancel={() => setShowResetPad(false)}
+            onSuccess={() => { setShowResetPad(false); clearRole() }}
+          />
+        )}
+
       </div>
+
+      <RewardToast kidId={viewingKidId} />
     </div>
   )
 }
 
 // ─── Header ──────────────────────────────────────────────────────────────────
-function Header({ kid, activeKid, setActiveKid }) {
+function Header({ kid, activeKid, setActiveKid, onLongPress }) {
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', month: 'short', day: 'numeric'
   })
+  const longPress = useLongPress(onLongPress, 800)
 
   return (
     <header style={{
@@ -58,9 +98,8 @@ function Header({ kid, activeKid, setActiveKid }) {
       top: 0,
       zIndex: 20,
     }}>
-      {/* Title row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-        <div>
+        <div {...longPress} style={{ touchAction: 'manipulation', cursor: 'pointer', userSelect: 'none' }}>
           <div style={{
             color: THEME.gold,
             fontSize: 11,
@@ -127,7 +166,7 @@ function TabNav({ activeTab, setActiveTab }) {
       background: THEME.surface,
       borderBottom: `1px solid ${THEME.border}`,
       position: 'sticky',
-      top: 136, // height of header
+      top: 136,
       zIndex: 19,
     }}>
       {TABS.map(tab => (
@@ -154,4 +193,65 @@ function TabNav({ activeTab, setActiveTab }) {
       ))}
     </nav>
   )
+}
+
+// ─── Reset overlay ────────────────────────────────────────────────────────────
+function ResetOverlay({ expectedHash, onCancel, onSuccess }) {
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 100,
+    }}>
+      <div style={{
+        background: THEME.surface,
+        borderRadius: 16,
+        border: `1px solid ${THEME.border}`,
+        maxWidth: 320,
+        width: '90%',
+      }}>
+        <PinPad
+          mode="verify"
+          expectedHash={expectedHash}
+          onSuccess={onSuccess}
+          onCancel={onCancel}
+        />
+      </div>
+    </div>
+  )
+}
+
+// ─── Long-press hook (pointer-based, mobile-safe) ────────────────────────────
+function useLongPress(handler, ms = 800) {
+  const timerRef = useRef(null)
+  const startedAtRef = useRef(0)
+
+  const cancel = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }
+
+  return {
+    onPointerDown: () => {
+      startedAtRef.current = Date.now()
+      cancel()
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null
+        handler?.()
+      }, ms)
+    },
+    onPointerUp: cancel,
+    onPointerLeave: cancel,
+    onPointerCancel: cancel,
+    onPointerMove: (e) => {
+      // Cancel if the user appears to be scrolling
+      if (Math.abs(e.movementX) + Math.abs(e.movementY) > 6) cancel()
+    },
+  }
 }
