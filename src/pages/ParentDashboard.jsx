@@ -25,14 +25,14 @@ export default function ParentDashboard() {
             letterSpacing: 2,
             fontFamily: 'Barlow Condensed, sans-serif',
             fontWeight: 700,
-          }}>Parent View</div>
+          }}>Parent View · Daily Dub</div>
           <div style={{
             fontSize: 24,
             fontWeight: 800,
             fontFamily: 'Barlow Condensed, sans-serif',
             letterSpacing: 1,
             lineHeight: 1.1,
-          }}>Daily Snapshot</div>
+          }}>Today's Snapshot</div>
         </div>
         <button
           onClick={clearRole}

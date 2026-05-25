@@ -1,4 +1,5 @@
 import { useShotSessions } from '../hooks/useShotSessions'
+import { useDailyW } from '../hooks/useDailyW'
 import { THEME } from '../lib/constants'
 import BadgeRow from '../components/BadgeRow'
 
@@ -21,6 +22,7 @@ function calcPct(makes, attempts) {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function StatsPage({ kidId, kidName }) {
   const { allSessions, loading, error } = useShotSessions(kidId)
+  const { currentStreak, weeklyCount, allTimeCount } = useDailyW(kidId)
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: THEME.muted }}>Loading...</div>
   if (error)   return <ErrorState message={error} />
@@ -33,6 +35,14 @@ export default function StatsPage({ kidId, kidName }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      <Section label="Daily Dubs">
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <StatPill label="Current Streak" value={currentStreak > 0 ? `${currentStreak}🔥` : '—'} gold />
+          <StatPill label="This Week"      value={weeklyCount} />
+          <StatPill label="All Time"       value={allTimeCount} />
+        </div>
+      </Section>
 
       <BadgeRow kidId={kidId} />
 

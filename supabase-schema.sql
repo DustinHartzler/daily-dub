@@ -63,6 +63,17 @@ CREATE TABLE IF NOT EXISTS weekly_challenges (
 CREATE INDEX IF NOT EXISTS weekly_challenges_week_idx
   ON weekly_challenges(week_start, kind);
 
+-- Daily Ws — one row per kid per day when all three pillars (Mind/Body/Character) hit.
+CREATE TABLE IF NOT EXISTS daily_ws (
+  id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  kid_id     TEXT NOT NULL REFERENCES kids(id),
+  date       DATE NOT NULL,
+  earned_at  TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(kid_id, date)
+);
+
+CREATE INDEX IF NOT EXISTS daily_ws_kid_date_idx ON daily_ws(kid_id, date DESC);
+
 -- Streaks — one row per kid per task, updated nightly (or on completion)
 CREATE TABLE IF NOT EXISTS streaks (
   id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -92,6 +103,7 @@ ALTER TABLE daily_logs         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shot_sessions      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE streaks            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE weekly_challenges  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_ws           ENABLE ROW LEVEL SECURITY;
 
 -- Allow anon role to read and write all tables (family app, no login needed)
 CREATE POLICY "anon full access" ON kids               FOR ALL TO anon USING (true) WITH CHECK (true);
@@ -99,3 +111,4 @@ CREATE POLICY "anon full access" ON daily_logs         FOR ALL TO anon USING (tr
 CREATE POLICY "anon full access" ON shot_sessions      FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "anon full access" ON streaks            FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "anon full access" ON weekly_challenges  FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "anon full access" ON daily_ws           FOR ALL TO anon USING (true) WITH CHECK (true);

@@ -109,17 +109,17 @@ function Header({ kid, activeKid, setActiveKid, onLongPress }) {
             fontWeight: 700,
             marginBottom: 2,
           }}>
-            Dayton Christian
+            Mind • Body • Character
           </div>
           <div style={{
             color: THEME.text,
-            fontSize: 28,
+            fontSize: 32,
             fontWeight: 800,
             fontFamily: 'Barlow Condensed, sans-serif',
             letterSpacing: 1,
             lineHeight: 1,
           }}>
-            Daily Tracker
+            Daily <span style={{ color: THEME.gold }}>Dub</span>
           </div>
           <div style={{ color: `${THEME.text}55`, fontSize: 12, marginTop: 4 }}>{today}</div>
         </div>

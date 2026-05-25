@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
-        name: 'DC Daily Tracker',
-        short_name: 'DC Tracker',
-        description: 'Dayton Christian daily task and shot tracker',
+        name: 'Daily Dub',
+        short_name: 'Daily Dub',
+        description: 'Build successful habits for the mind, body, and character.',
         theme_color: '#4B2D83',
         background_color: '#0F0C17',
         display: 'standalone',

@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDailyLog } from '../hooks/useDailyLog'
+import { useDailyW } from '../hooks/useDailyW'
 import { useDeviceRole } from '../context/DeviceRoleContext'
 import { getChores, TIMED_TASKS, THEME } from '../lib/constants'
 import WeeklyChallengesCard from '../components/WeeklyChallengesCard'
+import PillarsBar from '../components/PillarsBar'
+import WBadge from '../components/WBadge'
 
 export default function DailyPage({ kidId }) {
   const { log, updateLog, loading, error } = useDailyLog(kidId)
+  const { pillars, earnedToday, currentStreak, weeklyCount } = useDailyW(kidId)
   const { canEdit } = useDeviceRole()
   const editable = canEdit(kidId)
   const chores = getChores(kidId)
@@ -18,9 +22,6 @@ export default function DailyPage({ kidId }) {
     const secs = log[`${t.id}_seconds`] ?? 0
     return secs >= t.targetMinutes * 60
   }).length
-
-  const total = chores.length + TIMED_TASKS.length
-  const done  = choresCompleted + timedDone
 
   const toggleChore = (chore) => {
     if (!editable) return
@@ -38,14 +39,17 @@ export default function DailyPage({ kidId }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {!editable && <ReadOnlyBanner />}
 
-      <WeeklyChallengesCard />
+      {earnedToday && (
+        <WBadge currentStreak={currentStreak} weeklyCount={weeklyCount} />
+      )}
 
-      {/* Progress summary */}
-      <ProgressBar done={done} total={total} />
+      <PillarsBar pillars={pillars} />
+
+      <WeeklyChallengesCard />
 
       {/* Chores */}
       <Section label="Chores" count={`${choresCompleted}/${chores.length}`}>
@@ -91,35 +95,6 @@ function ReadOnlyBanner() {
       textAlign: 'center',
     }}>
       👀 Viewing only — switch back to your own tab to make changes.
-    </div>
-  )
-}
-
-// ─── Progress Bar ─────────────────────────────────────────────────────────────
-function ProgressBar({ done, total }) {
-  const pct = total ? Math.round((done / total) * 100) : 0
-  return (
-    <div style={{
-      background: THEME.surface2,
-      border: `1px solid ${THEME.border}`,
-      borderRadius: 12,
-      padding: '14px 16px',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ color: THEME.muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.5 }}>Today's Progress</span>
-        <span style={{ color: THEME.gold, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 18 }}>
-          {done}/{total}
-        </span>
-      </div>
-      <div style={{ height: 6, background: THEME.border, borderRadius: 4, overflow: 'hidden' }}>
-        <div style={{
-          height: '100%',
-          width: `${pct}%`,
-          background: `linear-gradient(90deg, ${THEME.purple}, ${THEME.gold})`,
-          borderRadius: 4,
-          transition: 'width 0.4s ease',
-        }} />
-      </div>
     </div>
   )
 }
