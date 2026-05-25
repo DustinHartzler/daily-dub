@@ -1,7 +1,7 @@
 // ─── Kids ────────────────────────────────────────────────────────────────────
 export const KIDS = [
-  { id: 'kenley', name: 'Kenley', age: 12, emoji: '🏀' },
-  { id: 'kellen', name: 'Kellen', age: 9,  emoji: '⛹️'  },
+  { id: 'kenley', name: 'Kenley', age: 12, icon: 'dancer' },
+  { id: 'kellen', name: 'Kellen', age: 9,  icon: 'person-standing' },
 ]
 
 // ─── Daily Chores ─────────────────────────────────────────────────────────────
@@ -20,9 +20,9 @@ export const getChores = (kidId) => CHORES_BY_KID[kidId] ?? []
 
 // ─── Timed Tasks ──────────────────────────────────────────────────────────────
 export const TIMED_TASKS = [
-  { id: 'reading', label: 'Reading',  icon: '📖', targetMinutes: 15 },
-  { id: 'piano',   label: 'Piano',    icon: '🎹', targetMinutes: 15 },
-  { id: 'spanish', label: 'Spanish',  icon: '🇪🇸', targetMinutes: 15, hasNote: true, notePlaceholder: 'What did you do? (Duolingo, show, book…)' },
+  { id: 'reading', label: 'Reading', icon: 'book-open', targetMinutes: 15 },
+  { id: 'piano',   label: 'Piano',   icon: 'music',     targetMinutes: 15 },
+  { id: 'spanish', label: 'Spanish', icon: 'languages', targetMinutes: 15, hasNote: true, notePlaceholder: 'What did you do? (Duolingo, show, book…)' },
 ]
 
 // ─── Basketball Shot Types ────────────────────────────────────────────────────

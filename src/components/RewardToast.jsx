@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useEasterEggs } from '../hooks/useEasterEggs'
 import { THEME } from '../lib/constants'
+import Icon from './Icon'
 
 const AUTO_DISMISS_MS = 4000
 
@@ -37,7 +38,7 @@ export default function RewardToast({ kidId }) {
         cursor: 'pointer',
       }}
     >
-      <span style={{ fontSize: 28 }}>{reward.emoji}</span>
+      <Icon name={reward.icon} size={28} color={THEME.gold} />
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <span style={{
           color: THEME.gold,

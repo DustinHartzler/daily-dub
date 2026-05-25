@@ -1,5 +1,6 @@
 import { useWeeklyChallenges } from '../hooks/useWeeklyChallenges'
 import { THEME } from '../lib/constants'
+import Icon from './Icon'
 
 export default function WeeklyChallengesCard() {
   const { verse, fun, loading } = useWeeklyChallenges()
@@ -54,10 +55,14 @@ export default function WeeklyChallengesCard() {
               border: `1px solid ${THEME.border}`,
               fontSize: 13,
               color: THEME.text,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
             }}>
-              <span style={{ marginRight: 6 }}>✨</span>
-              <span style={{ fontWeight: 700 }}>{c.title ?? 'Challenge'}: </span>
-              <span style={{ color: THEME.muted }}>{c.body}</span>
+              <Icon name="sparkles" size={14} color={THEME.gold} />
+              <span><span style={{ fontWeight: 700 }}>{c.title ?? 'Challenge'}: </span>
+                <span style={{ color: THEME.muted }}>{c.body}</span>
+              </span>
             </div>
           ))}
         </div>

@@ -1,10 +1,10 @@
 export const BADGES = [
-  { days: 3,  emoji: '🔥',  label: 'Hot Streak'   },
-  { days: 7,  emoji: '⭐',  label: 'One Week'     },
-  { days: 14, emoji: '💪',  label: 'Two Weeks'    },
-  { days: 30, emoji: '🏆',  label: 'Champion'     },
-  { days: 60, emoji: '👑',  label: 'Royalty'      },
-  { days: 100, emoji: '💎', label: 'Diamond'      },
+  { days: 3,   icon: 'flame',    label: 'Hot Streak' },
+  { days: 7,   icon: 'star',     label: 'One Week'   },
+  { days: 14,  icon: 'dumbbell', label: 'Two Weeks'  },
+  { days: 30,  icon: 'trophy',   label: 'Champion'   },
+  { days: 60,  icon: 'crown',    label: 'Royalty'    },
+  { days: 100, icon: 'gem',      label: 'Diamond'    },
 ]
 
 export function badgesEarned(currentStreak = 0) {

@@ -3,6 +3,7 @@ import { useShotSessions } from '../hooks/useShotSessions'
 import { useDeviceRole } from '../context/DeviceRoleContext'
 import { KIDS, TIMED_TASKS, THEME, getChores } from '../lib/constants'
 import WeeklyChallengesEditor from '../components/WeeklyChallengesEditor'
+import Icon from '../components/Icon'
 
 export default function ParentDashboard() {
   const { clearRole } = useDeviceRole()
@@ -98,8 +99,10 @@ function KidCard({ kid }) {
         return (
           <Stat
             key={t.id}
-            label={`${t.icon} ${t.label}`}
-            value={`${mins} / ${target} min${done ? ' ✓' : ''}`}
+            label={t.label}
+            icon={t.icon}
+            value={done ? `${mins} / ${target} min` : `${mins} / ${target} min`}
+            done={done}
             valueColor={done ? THEME.gold : THEME.text}
           />
         )
@@ -145,7 +148,7 @@ function Card({ children }) {
 function CardHeader({ kid }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-      <span style={{ fontSize: 28 }}>{kid.emoji}</span>
+      <Icon name={kid.icon} size={26} color={THEME.gold} />
       <span style={{
         fontFamily: 'Barlow Condensed, sans-serif',
         fontSize: 22,
@@ -156,7 +159,7 @@ function CardHeader({ kid }) {
   )
 }
 
-function Stat({ label, value, valueColor }) {
+function Stat({ label, value, valueColor, icon, done }) {
   return (
     <div style={{
       display: 'flex',
@@ -167,13 +170,22 @@ function Stat({ label, value, valueColor }) {
       borderRadius: 8,
       border: `1px solid ${THEME.border}`,
     }}>
-      <span style={{ color: THEME.muted, fontSize: 13 }}>{label}</span>
+      <span style={{ color: THEME.muted, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        {icon && <Icon name={icon} size={14} color={THEME.muted} />}
+        {label}
+      </span>
       <span style={{
         color: valueColor ?? THEME.text,
         fontFamily: 'Barlow Condensed, sans-serif',
         fontWeight: 700,
         fontSize: 16,
-      }}>{value}</span>
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+      }}>
+        {value}
+        {done && <Icon name="check" size={14} color={THEME.gold} />}
+      </span>
     </div>
   )
 }

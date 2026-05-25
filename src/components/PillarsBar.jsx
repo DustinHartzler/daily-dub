@@ -1,5 +1,6 @@
 import { PILLAR_ORDER, PILLARS } from '../lib/pillars'
 import { THEME } from '../lib/constants'
+import Icon from './Icon'
 
 // Three small pillar meters at top of the Daily page.
 export default function PillarsBar({ pillars }) {
@@ -32,7 +33,7 @@ function PillarTile({ pillar, state }) {
       gap: 6,
       transition: 'border-color 0.2s',
     }}>
-      <span style={{ fontSize: 22, lineHeight: 1 }}>{pillar.icon}</span>
+      <Icon name={pillar.icon} size={22} color={done ? pillar.color : THEME.muted} />
       <span style={{
         color: done ? pillar.color : THEME.muted,
         fontSize: 11,

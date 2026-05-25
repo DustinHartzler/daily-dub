@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { THEME } from '../lib/constants'
 import { verifyPin } from '../lib/pin'
+import Icon from './Icon'
 
 // Props:
 //   mode: 'create' | 'verify'
@@ -75,7 +76,7 @@ export default function PinPad({ mode, expectedHash, onCreate, onSuccess, onCanc
         ))}
         <div />
         <KeyBtn onClick={() => press('0')}>0</KeyBtn>
-        <KeyBtn onClick={backspace} muted>⌫</KeyBtn>
+        <KeyBtn onClick={backspace} muted><Icon name="backspace" size={20} /></KeyBtn>
       </div>
 
       {onCancel && (

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { KIDS, THEME } from '../lib/constants'
 import { useDeviceRole } from '../context/DeviceRoleContext'
 import PinPad from '../components/PinPad'
+import Icon from '../components/Icon'
 
 // First-launch flow. Pick Kenley, Kellen, or Parent (Parent requires PIN).
 export default function SetupPage() {
@@ -48,12 +49,12 @@ export default function SetupPage() {
 
         {KIDS.map(k => (
           <RoleButton key={k.id} onClick={() => pickKid(k.id)}>
-            <span style={{ fontSize: 24 }}>{k.emoji}</span>
+            <Icon name={k.icon} size={22} />
             <span>{k.name}</span>
           </RoleButton>
         ))}
         <RoleButton onClick={() => setChosen('parent')} accent>
-          <span style={{ fontSize: 22 }}>👤</span>
+          <Icon name="user" size={22} />
           <span>Parent</span>
         </RoleButton>
       </div>

@@ -7,19 +7,19 @@ export const SPORTS = {
   basketball: {
     id: 'basketball',
     label: 'Basketball',
-    icon: '🏀',
+    icon: 'basketball',
     shotTypes: SHOT_TYPES,
   },
   baseball: {
     id: 'baseball',
     label: 'Baseball',
-    icon: '⚾',
+    icon: 'baseball',
     shotTypes: [], // forms TBD: at-bats / hits / pitches / minutes
   },
   soccer: {
     id: 'soccer',
     label: 'Soccer',
-    icon: '⚽',
+    icon: 'soccer',
     shotTypes: [], // forms TBD: shots on goal / saves / minutes
   },
 }

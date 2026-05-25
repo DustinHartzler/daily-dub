@@ -1,4 +1,5 @@
 import { THEME } from '../lib/constants'
+import Icon from './Icon'
 
 // Celebratory badge shown on the Daily page once all three pillars hit.
 export default function WBadge({ currentStreak, weeklyCount }) {
@@ -45,10 +46,16 @@ export default function WBadge({ currentStreak, weeklyCount }) {
         </span>
         <div style={{ display: 'flex', gap: 12, marginTop: 6, color: THEME.muted, fontSize: 12 }}>
           {currentStreak > 0 && (
-            <span>🔥 {currentStreak}-day streak</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Icon name="flame" size={13} color={THEME.gold} />
+              {currentStreak}-day streak
+            </span>
           )}
           {weeklyCount > 0 && (
-            <span>📅 {weeklyCount} this week</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Icon name="calendar" size={13} />
+              {weeklyCount} this week
+            </span>
           )}
         </div>
       </div>

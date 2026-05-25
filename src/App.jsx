@@ -5,14 +5,15 @@ import SetupPage from './pages/SetupPage'
 import ParentDashboard from './pages/ParentDashboard'
 import PinPad from './components/PinPad'
 import RewardToast from './components/RewardToast'
+import Icon from './components/Icon'
 import DailyPage from './pages/DailyPage'
 import ShotsPage from './pages/ShotsPage'
 import StatsPage from './pages/StatsPage'
 
 const TABS = [
-  { id: 'daily', label: 'Daily'    },
-  { id: 'shots', label: '🏀 Shots' },
-  { id: 'stats', label: 'Stats'    },
+  { id: 'daily', label: 'Daily' },
+  { id: 'shots', label: 'Shots' },
+  { id: 'stats', label: 'Stats' },
 ]
 
 export default function App() {
@@ -149,7 +150,7 @@ function Header({ kid, activeKid, setActiveKid, onLongPress }) {
               transition: 'all 0.15s',
             }}
           >
-            <span style={{ fontSize: 20 }}>{k.emoji}</span>
+            <Icon name={k.icon} size={20} />
             {k.name}
           </button>
         ))}

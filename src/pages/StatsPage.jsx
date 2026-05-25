@@ -2,6 +2,7 @@ import { useShotSessions } from '../hooks/useShotSessions'
 import { useDailyW } from '../hooks/useDailyW'
 import { THEME } from '../lib/constants'
 import BadgeRow from '../components/BadgeRow'
+import Icon from '../components/Icon'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getWeekStart() {
@@ -38,9 +39,19 @@ export default function StatsPage({ kidId, kidName }) {
 
       <Section label="Daily Dubs">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <StatPill label="Current Streak" value={currentStreak > 0 ? `${currentStreak}🔥` : '—'} gold />
-          <StatPill label="This Week"      value={weeklyCount} />
-          <StatPill label="All Time"       value={allTimeCount} />
+          <StatPill
+            label="Current Streak"
+            value={
+              currentStreak > 0
+                ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    {currentStreak}<Icon name="flame" size={18} color={THEME.gold} />
+                  </span>
+                : '—'
+            }
+            gold
+          />
+          <StatPill label="This Week" value={weeklyCount} />
+          <StatPill label="All Time"  value={allTimeCount} />
         </div>
       </Section>
 
@@ -54,11 +65,11 @@ export default function StatsPage({ kidId, kidName }) {
 
       {/* Streaks placeholder — will wire to DB in next iteration */}
       <Section label="Streaks">
-        <StreakRow emoji="📖" label="Reading"  streak={0} />
-        <StreakRow emoji="🎹" label="Piano"    streak={0} />
-        <StreakRow emoji="🇪🇸" label="Spanish"  streak={0} />
-        <StreakRow emoji="🏀" label="Shooting"  streak={0} />
-        <StreakRow emoji="✅" label="All Tasks" streak={0} />
+        <StreakRow icon="book-open"  label="Reading"   streak={0} />
+        <StreakRow icon="music"      label="Piano"     streak={0} />
+        <StreakRow icon="languages"  label="Spanish"   streak={0} />
+        <StreakRow icon="basketball" label="Shooting"  streak={0} />
+        <StreakRow icon="check"      label="All Tasks" streak={0} />
       </Section>
 
     </div>
@@ -125,7 +136,8 @@ function ShootingBlock({ label, sessions }) {
 }
 
 // ── Streak row ────────────────────────────────────────────────────────────────
-function StreakRow({ emoji, label, streak }) {
+function StreakRow({ icon, label, streak }) {
+  const active = streak > 0
   return (
     <div style={{
       display: 'flex',
@@ -136,9 +148,22 @@ function StreakRow({ emoji, label, streak }) {
       border: `1px solid ${THEME.border}`,
       borderRadius: 10,
     }}>
-      <span style={{ color: THEME.text, fontSize: 15 }}>{emoji} {label}</span>
-      <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 18, color: streak > 0 ? THEME.gold : THEME.muted }}>
-        {streak > 0 ? `${streak} day streak 🔥` : '—'}
+      <span style={{ color: THEME.text, fontSize: 15, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Icon name={icon} size={16} color={THEME.muted} />
+        {label}
+      </span>
+      <span style={{
+        fontFamily: 'Barlow Condensed, sans-serif',
+        fontWeight: 700,
+        fontSize: 18,
+        color: active ? THEME.gold : THEME.muted,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+      }}>
+        {active
+          ? <>{streak} day streak <Icon name="flame" size={16} color={THEME.gold} /></>
+          : '—'}
       </span>
     </div>
   )

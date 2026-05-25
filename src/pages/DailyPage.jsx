@@ -6,6 +6,7 @@ import { getChores, TIMED_TASKS, THEME } from '../lib/constants'
 import WeeklyChallengesCard from '../components/WeeklyChallengesCard'
 import PillarsBar from '../components/PillarsBar'
 import WBadge from '../components/WBadge'
+import Icon from '../components/Icon'
 
 export default function DailyPage({ kidId }) {
   const { log, updateLog, loading, error } = useDailyLog(kidId)
@@ -93,8 +94,13 @@ function ReadOnlyBanner() {
       color: THEME.gold,
       fontSize: 12,
       textAlign: 'center',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
     }}>
-      👀 Viewing only — switch back to your own tab to make changes.
+      <Icon name="eye" size={14} />
+      Viewing only — switch back to your own tab to make changes.
     </div>
   )
 }
@@ -216,7 +222,7 @@ function TimedTask({ task, currentSeconds, note, onUpdate, onNoteChange, editabl
       {/* Top row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 20 }}>{task.icon}</span>
+          <Icon name={task.icon} size={20} color={isDone ? THEME.gold : THEME.muted} />
           <span style={{ color: THEME.text, fontWeight: 600, fontSize: 15 }}>{task.label}</span>
         </div>
         <span style={{
@@ -224,9 +230,12 @@ function TimedTask({ task, currentSeconds, note, onUpdate, onNoteChange, editabl
           fontFamily: 'Barlow Condensed, sans-serif',
           fontSize: 20,
           fontWeight: 700,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
         }}>
           {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')} / {task.targetMinutes}:00
-          {isDone && ' ✓'}
+          {isDone && <Icon name="check" size={16} color={THEME.gold} />}
         </span>
       </div>
 
@@ -256,9 +265,18 @@ function TimedTask({ task, currentSeconds, note, onUpdate, onNoteChange, editabl
             fontWeight: 700,
             fontSize: 14,
             opacity: editable ? 1 : 0.55,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
           }}
         >
-          {isDone ? 'Complete ✓' : running ? '⏸ Pause' : '▶ Start'}
+          {isDone
+            ? <><Icon name="check" size={16} /> Complete</>
+            : running
+              ? <><Icon name="pause" size={16} /> Pause</>
+              : <><Icon name="play" size={16} /> Start</>
+          }
         </button>
         <button
           onClick={reset}
@@ -271,8 +289,10 @@ function TimedTask({ task, currentSeconds, note, onUpdate, onNoteChange, editabl
             color: THEME.muted,
             fontSize: 14,
             opacity: editable ? 1 : 0.55,
+            display: 'inline-flex',
+            alignItems: 'center',
           }}
-        >↺</button>
+        ><Icon name="rotate-ccw" size={16} /></button>
       </div>
 
       {/* Optional note field */}

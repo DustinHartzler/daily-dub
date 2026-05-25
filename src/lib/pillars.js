@@ -4,7 +4,7 @@ export const PILLARS = {
   mind: {
     id:    'mind',
     label: 'Mind',
-    icon:  '🧠',
+    icon:  'brain',
     color: '#7C5BFF',
     chores:     [],
     timedTasks: ['reading', 'piano', 'spanish'],
@@ -13,7 +13,7 @@ export const PILLARS = {
   body: {
     id:    'body',
     label: 'Body',
-    icon:  '💪',
+    icon:  'dumbbell',
     color: '#E15B7C',
     chores:     ['Brush teeth (AM)'],
     timedTasks: [],
@@ -22,7 +22,7 @@ export const PILLARS = {
   character: {
     id:    'character',
     label: 'Character',
-    icon:  '⭐',
+    icon:  'star',
     color: '#F2A900',
     chores:     ['Make bed', 'Pick up clothes'],
     timedTasks: [],

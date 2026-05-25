@@ -1,4 +1,5 @@
 import { THEME } from '../../lib/constants'
+import Icon from '../Icon'
 
 export default function SoccerForm() {
   return (
@@ -10,7 +11,9 @@ export default function SoccerForm() {
       textAlign: 'center',
       color: THEME.muted,
     }}>
-      <div style={{ fontSize: 32, marginBottom: 8 }}>⚽</div>
+      <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}>
+        <Icon name="soccer" size={36} color={THEME.muted} />
+      </div>
       <div style={{
         color: THEME.gold,
         fontFamily: 'Barlow Condensed, sans-serif',

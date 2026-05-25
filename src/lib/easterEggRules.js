@@ -12,7 +12,7 @@ export const EASTER_EGG_RULES = [
   {
     id: 'early-bird',
     label: 'Early Bird',
-    emoji: '🌅',
+    icon: 'sunrise',
     message: 'All chores done before 8am — you crushed it!',
     check: (_ctx) => false, // TODO: return true when all chores done AND now.getHours() < 8
   },

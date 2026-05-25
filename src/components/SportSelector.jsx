@@ -1,5 +1,6 @@
 import { SPORTS } from '../lib/sports'
 import { THEME } from '../lib/constants'
+import Icon from './Icon'
 
 // Segmented control. Only renders when there's more than one sport to choose.
 export default function SportSelector({ sports, value, onChange }) {
@@ -38,7 +39,7 @@ export default function SportSelector({ sports, value, onChange }) {
               gap: 6,
             }}
           >
-            <span>{sport.icon}</span>
+            <Icon name={sport.icon} size={16} />
             {sport.label}
           </button>
         )

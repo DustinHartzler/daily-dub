@@ -1,6 +1,7 @@
 import { useStreaks } from '../hooks/useStreaks'
 import { badgesEarned } from '../lib/badges'
 import { THEME } from '../lib/constants'
+import Icon from './Icon'
 
 export default function BadgeRow({ kidId }) {
   const { maxCurrent, loading } = useStreaks(kidId)
@@ -54,7 +55,7 @@ function Badge({ badge }) {
       opacity: badge.earned ? 1 : 0.55,
       filter: badge.earned ? 'none' : 'grayscale(1)',
     }}>
-      <div style={{ fontSize: 26, lineHeight: 1.1 }}>{badge.emoji}</div>
+      <Icon name={badge.icon} size={26} color={badge.earned ? THEME.gold : THEME.muted} />
       <div style={{
         color: badge.earned ? THEME.gold : THEME.muted,
         fontSize: 10,

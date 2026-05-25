@@ -4,6 +4,7 @@ import { useDeviceRole } from '../context/DeviceRoleContext'
 import { SPORTS, getSportsForKid } from '../lib/sports'
 import { THEME } from '../lib/constants'
 import SportSelector from '../components/SportSelector'
+import Icon from '../components/Icon'
 import BasketballForm from '../components/sports/BasketballForm'
 import BaseballForm from '../components/sports/BaseballForm'
 import SoccerForm from '../components/sports/SoccerForm'
@@ -51,8 +52,13 @@ export default function ShotsPage({ kidId }) {
           color: THEME.gold,
           fontSize: 12,
           textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
         }}>
-          👀 Viewing only — switch back to your own tab to log shots.
+          <Icon name="eye" size={14} />
+          Viewing only — switch back to your own tab to log shots.
         </div>
       )}
 
