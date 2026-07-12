@@ -9,9 +9,11 @@ import Icon from './components/Icon'
 import DailyPage from './pages/DailyPage'
 import ShotsPage from './pages/ShotsPage'
 import StatsPage from './pages/StatsPage'
+import TodayPage from './pages/TodayPage'
 
 const TABS = [
   { id: 'daily', label: 'Daily' },
+  { id: 'today', label: 'Today' },
   { id: 'shots', label: 'Shots' },
   { id: 'stats', label: 'Stats' },
 ]
@@ -64,6 +66,7 @@ function KidShell() {
 
         <main style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 120px' }}>
           {activeTab === 'daily' && <DailyPage kidId={viewingKidId} />}
+          {activeTab === 'today' && <TodayPage kidId={viewingKidId} />}
           {activeTab === 'shots' && <ShotsPage kidId={viewingKidId} kidName={kid.name} />}
           {activeTab === 'stats' && <StatsPage kidId={viewingKidId} kidName={kid.name} />}
         </main>

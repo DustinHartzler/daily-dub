@@ -1,5 +1,6 @@
 import { useShotSessions } from '../hooks/useShotSessions'
 import { useDailyW } from '../hooks/useDailyW'
+import { useStreaks } from '../hooks/useStreaks'
 import { THEME } from '../lib/constants'
 import BadgeRow from '../components/BadgeRow'
 import Icon from '../components/Icon'
@@ -24,6 +25,7 @@ function calcPct(makes, attempts) {
 export default function StatsPage({ kidId, kidName }) {
   const { allSessions, loading, error } = useShotSessions(kidId)
   const { currentStreak, weeklyCount, allTimeCount } = useDailyW(kidId)
+  const { byTask } = useStreaks(kidId)
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: THEME.muted }}>Loading...</div>
   if (error)   return <ErrorState message={error} />
@@ -63,13 +65,13 @@ export default function StatsPage({ kidId, kidName }) {
       {/* Shooting — this month */}
       <ShootingBlock label="This Month" sessions={monthSessions} />
 
-      {/* Streaks placeholder — will wire to DB in next iteration */}
+      {/* Streaks — computed from history in useStreaks */}
       <Section label="Streaks">
-        <StreakRow icon="book-open"  label="Reading"   streak={0} />
-        <StreakRow icon="music"      label="Piano"     streak={0} />
-        <StreakRow icon="languages"  label="Spanish"   streak={0} />
-        <StreakRow icon="basketball" label="Shooting"  streak={0} />
-        <StreakRow icon="check"      label="All Tasks" streak={0} />
+        <StreakRow icon="book-open"  label="Reading"   streak={byTask.reading?.current_streak   ?? 0} best={byTask.reading?.longest_streak} />
+        <StreakRow icon="music"      label="Piano"     streak={byTask.piano?.current_streak     ?? 0} best={byTask.piano?.longest_streak} />
+        <StreakRow icon="languages"  label="Spanish"   streak={byTask.spanish?.current_streak   ?? 0} best={byTask.spanish?.longest_streak} />
+        <StreakRow icon="basketball" label="Shooting"  streak={byTask.shooting?.current_streak  ?? 0} best={byTask.shooting?.longest_streak} />
+        <StreakRow icon="check"      label="All Tasks" streak={byTask.all_tasks?.current_streak ?? 0} best={byTask.all_tasks?.longest_streak} />
       </Section>
 
     </div>
@@ -136,7 +138,7 @@ function ShootingBlock({ label, sessions }) {
 }
 
 // ── Streak row ────────────────────────────────────────────────────────────────
-function StreakRow({ icon, label, streak }) {
+function StreakRow({ icon, label, streak, best }) {
   const active = streak > 0
   return (
     <div style={{
@@ -163,7 +165,9 @@ function StreakRow({ icon, label, streak }) {
       }}>
         {active
           ? <>{streak} day streak <Icon name="flame" size={16} color={THEME.gold} /></>
-          : '—'}
+          : (best > 0
+              ? <span style={{ color: THEME.muted, fontSize: 13 }}>best {best}</span>
+              : '—')}
       </span>
     </div>
   )

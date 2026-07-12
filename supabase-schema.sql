@@ -112,3 +112,26 @@ CREATE POLICY "anon full access" ON shot_sessions      FOR ALL TO anon USING (tr
 CREATE POLICY "anon full access" ON streaks            FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "anon full access" ON weekly_challenges  FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "anon full access" ON daily_ws           FOR ALL TO anon USING (true) WITH CHECK (true);
+
+-- ─── Announcements & Events ───────────────────────────────────────────────────
+-- Family calendar. Two shapes share one table:
+--   date IS NULL          → standing announcement (always shown, pinned to top)
+--   date = 'YYYY-MM-DD'   → dated event
+--   start_time IS NULL    → all-day (only meaningful when dated)
+--   kid_id IS NULL        → applies to the whole family (shown to both kids)
+CREATE TABLE IF NOT EXISTS announcements (
+  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  kid_id      TEXT REFERENCES kids(id),
+  title       TEXT NOT NULL,
+  body        TEXT NOT NULL DEFAULT '',
+  date        DATE,
+  start_time  TIME,
+  end_time    TIME,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS announcements_date_idx ON announcements(date);
+
+ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon full access" ON announcements FOR ALL TO anon USING (true) WITH CHECK (true);

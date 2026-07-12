@@ -2,6 +2,7 @@ import {
   Brain, Dumbbell, Star, BookOpen, Music2, Languages,
   Flame, Trophy, Crown, Gem, Sunrise, User, PersonStanding,
   Eye, Sparkles, Delete, Check, Play, Pause, RotateCcw, Calendar,
+  Bell, Clock, Megaphone, Trash2, Plus, Pencil, X, Users,
 } from 'lucide-react'
 
 // Named string → lucide component. Add aliases here as new icons are needed.
@@ -27,6 +28,14 @@ const LUCIDE = {
   pause:             Pause,
   'rotate-ccw':      RotateCcw,
   calendar:          Calendar,
+  bell:              Bell,
+  clock:             Clock,
+  megaphone:         Megaphone,
+  trash:             Trash2,
+  plus:              Plus,
+  pencil:            Pencil,
+  x:                 X,
+  users:             Users,
 }
 
 // Lucide doesn't ship basketball/baseball/soccer/dancer — render them inline.

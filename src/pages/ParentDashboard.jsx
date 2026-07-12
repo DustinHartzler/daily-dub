@@ -3,6 +3,7 @@ import { useShotSessions } from '../hooks/useShotSessions'
 import { useDeviceRole } from '../context/DeviceRoleContext'
 import { KIDS, TIMED_TASKS, THEME, getChores } from '../lib/constants'
 import WeeklyChallengesEditor from '../components/WeeklyChallengesEditor'
+import AnnouncementsEditor from '../components/AnnouncementsEditor'
 import Icon from '../components/Icon'
 
 export default function ParentDashboard() {
@@ -60,6 +61,8 @@ export default function ParentDashboard() {
         }}>
           {KIDS.map(k => <KidCard key={k.id} kid={k} />)}
         </div>
+
+        <AnnouncementsEditor />
 
         <WeeklyChallengesEditor />
       </main>
